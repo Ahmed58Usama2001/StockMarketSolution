@@ -17,7 +17,7 @@ namespace ServiceContracts.DTO
 
   public DateTime DateAndTimeOfOrder { get; set; }
 
-  public int Quantity { get; set; }
+  public uint Quantity { get; set; }
 
   public double Price { get; set; }
 

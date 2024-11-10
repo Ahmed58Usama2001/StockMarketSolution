@@ -26,7 +26,7 @@ public class StocksServiceTests
 
     [Theory]
     [InlineData(0)]
-    public void CreateBuyOrder_QuantityIsLessThanMinimum_ToBeArgumentException(int buyOrderQuantity)
+    public void CreateBuyOrder_QuantityIsLessThanMinimum_ToBeArgumentException(uint buyOrderQuantity)
     {
         BuyOrderRequest? buyOrderRequest = new BuyOrderRequest() { StockSymbol = "MSFT", StockName = "Microsoft", Price = 1, Quantity = buyOrderQuantity };
 
@@ -38,7 +38,7 @@ public class StocksServiceTests
 
     [Theory]
     [InlineData(100001)]
-    public void CreateBuyOrder_QuantityIsGreaterThanMaximum_ToBeArgumentException(int buyOrderQuantity)
+    public void CreateBuyOrder_QuantityIsGreaterThanMaximum_ToBeArgumentException(uint buyOrderQuantity)
     {
         BuyOrderRequest? buyOrderRequest = new BuyOrderRequest() { StockSymbol = "MSFT", StockName = "Microsoft", Price = 1, Quantity = buyOrderQuantity };
 
@@ -62,7 +62,7 @@ public class StocksServiceTests
 
     [Theory] 
     [InlineData(10001)] 
-    public void CreateBuyOrder_PriceIsGreaterThanMaximum_ToBeArgumentException(int buyOrderQuantity)
+    public void CreateBuyOrder_PriceIsGreaterThanMaximum_ToBeArgumentException(uint buyOrderQuantity)
     {
         BuyOrderRequest? buyOrderRequest = new BuyOrderRequest() { StockSymbol = "MSFT", StockName = "Microsoft", Price = 1, Quantity = buyOrderQuantity };
 
@@ -124,7 +124,7 @@ public class StocksServiceTests
 
     [Theory] 
     [InlineData(0)]
-    public void CreateSellOrder_QuantityIsLessThanMinimum_ToBeArgumentException(int sellOrderQuantity)
+    public void CreateSellOrder_QuantityIsLessThanMinimum_ToBeArgumentException(uint sellOrderQuantity)
     {
         SellOrderRequest? sellOrderRequest = new SellOrderRequest() { StockSymbol = "MSFT", StockName = "Microsoft", Price = 1, Quantity = sellOrderQuantity };
 
@@ -137,7 +137,7 @@ public class StocksServiceTests
 
     [Theory] 
     [InlineData(100001)] 
-    public void CreateSellOrder_QuantityIsGreaterThanMaximum_ToBeArgumentException(int sellOrderQuantity)
+    public void CreateSellOrder_QuantityIsGreaterThanMaximum_ToBeArgumentException(uint sellOrderQuantity)
     {
         SellOrderRequest? sellOrderRequest = new SellOrderRequest() { StockSymbol = "MSFT", StockName = "Microsoft", Price = 1, Quantity = sellOrderQuantity };
 
@@ -163,7 +163,7 @@ public class StocksServiceTests
 
     [Theory] 
     [InlineData(10001)] 
-    public void CreateSellOrder_PriceIsGreaterThanMaximum_ToBeArgumentException(int sellOrderQuantity)
+    public void CreateSellOrder_PriceIsGreaterThanMaximum_ToBeArgumentException(uint sellOrderQuantity)
     {
         SellOrderRequest? sellOrderRequest = new SellOrderRequest() { StockSymbol = "MSFT", StockName = "Microsoft", Price = 1, Quantity = sellOrderQuantity };
 

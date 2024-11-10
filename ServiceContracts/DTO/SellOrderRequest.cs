@@ -19,7 +19,7 @@ namespace ServiceContracts.DTO
 
 
   [Range(1, 100000, ErrorMessage = "You can sell maximum of 100000 shares in single order. Minimum is 1.")]
-  public int Quantity { get; set; }
+  public uint Quantity { get; set; }
 
 
   [Range(1, 10000, ErrorMessage = "The maximum price of stock is 10000. Minimum is 1.")]
