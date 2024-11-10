@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using ServiceContracts;
+using ServiceContracts.DTO;
 using StockMarketSolution.Models;
 
 namespace StockMarketSolution.Controllers;
@@ -47,7 +49,62 @@ public IActionResult Index()
     ViewBag.FinnhubToken = _configuration["FinnhubToken"];
 
     return View(stockTrade);
+}
+
+[HttpPost("[action]")]
+public IActionResult SellOrder(SellOrderRequest sellOrderRequest)
+    {
+        sellOrderRequest.DateAndTimeOfOrder = DateTime.Now;
+
+        ModelState.Clear();
+        TryValidateModel(sellOrderRequest);
+
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Errors = ModelState.Values.SelectMany(v=>v.Errors).Select(v=>v.ErrorMessage).ToList();
+            StockTrade stockTrade = new StockTrade() { StockName = sellOrderRequest.StockName, Quantity = sellOrderRequest.Quantity, StockSymbol = sellOrderRequest.StockSymbol };
+            return View("Index", stockTrade);
+        }
+
+        SellOrderResponse sellOrderResponse = _stocksService.CreateSellOrder(sellOrderRequest);
+
+        return RedirectToAction(nameof(Orders));
     }
+
+    [HttpPost("[action]")]
+    public IActionResult BuyOrder(BuyOrderRequest buyOrderRequest)
+    {
+        buyOrderRequest.DateAndTimeOfOrder = DateTime.Now;
+
+        ModelState.Clear();
+        TryValidateModel(buyOrderRequest);
+
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(v => v.ErrorMessage).ToList();
+            StockTrade stockTrade = new StockTrade() { StockName = buyOrderRequest.StockName, Quantity = buyOrderRequest.Quantity, StockSymbol = buyOrderRequest.StockSymbol };
+            return View("Index", stockTrade);
+        }
+
+        BuyOrderResponse buyOrderResponse = _stocksService.CreateBuyOrder(buyOrderRequest);
+
+        return RedirectToAction(nameof(Orders));
+    }
+
+    [Route("[action]")]
+public IActionResult Orders()
+{
+   List<BuyOrderResponse> buyOrderResponses = _stocksService.GetBuyOrders();
+   List<SellOrderResponse> sellOrderResponses = _stocksService.GetSellOrders();
+
+    Orders orders = new Orders() { BuyOrders = buyOrderResponses , SellOrders = sellOrderResponses};
+
+    return View(orders);
+
+ }
+
 }
 
 
