@@ -1,8 +1,9 @@
 ﻿@model StockTrade
 
 @{
- ViewBag.Title = "Trading";
- ViewBag.CurrentUrl = "~/Trade/Index";
+    ViewBag.Title = "Trading";
+
+    ViewBag.CurrentUrl = "~/Trade/Index";
 }
 
 <div class="text-grey ml">
@@ -12,63 +13,68 @@
 </div>
 
 <form method="post">
- <div class="box trading-panel">
+    <div class="box trading-panel">
 
-  <div class="flex trading-panel-flex">
-   <div id="stock-price-panel">
+        <div class="flex trading-panel-flex">
+            <div id="stock-price-panel">
 
-    <div class="stock">
-     <h1 class="stock-title">@Model.StockName (@Model.StockSymbol)</h1>
-     <h2 class="stock-price"><small class="text-grey">$</small> <span class="price">@Model.Price.ToString("N")</span></h2>
-    </div>
+                <div class="stock">
+                    <h1 class="stock-title">@Model.StockName (@Model.StockSymbol)</h1>
+                    <h2 class="stock-price"><small class="text-grey">$</small> <span class="price">@Model.Price.ToString("N")</span></h2>
+                </div>
 
-    <div class="date"></div>
-   </div>
+                <div class="chart mt">
+                    <canvas id="stock-chart" width="400px" height="150px"></canvas>
+                </div>
+
+                <div class="date"></div>
+            </div>
 
 
-  </div>
- </div>
 
 
+            <div id="new-order-panel">
 
-    <div id="new-order-panel">
+                <div class="flex flex-direction-vertical">
+                    <h3 class="text-grey mb">New Order</h3>
 
-        <div class="flex flex-direction-vertical">
-            <h3 class="text-grey mb">New Order</h3>
+                    <label asp-for="Quantity" class="mt">Quantity:</label>
+                    <div class="w-25">
+                        <input type="number" name="Quantity" asp-for="Quantity" min="1" max="100000" placeholder="Quantity" required="required" class="form-input mb" autofocus="autofocus" />
+                    </div>
+                </div>
 
-            <label asp-for="Quantity" class="mt">Quantity:</label>
-            <div class="w-25">
-                <input type="number" asp-for="Quantity" min="1" max="100000" placeholder="Quantity" required="required" class="form-input mb" autofocus="autofocus" />
+                <div class="button-panel">
+
+                    <button type="submit" formaction="~/Trade/SellOrder" class="button button-red-back trading-button sell-button">
+                        <i class="fa-solid fa-arrow-down"></i>
+                        <span>Sell</span>
+                    </button>
+
+                    <button type="submit" formaction="~/Trade/BuyOrder" class="button button-green-back trading-button buy-button">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        <span>Buy</span>
+                    </button>
+
+                    @if (ViewBag.Errors != null)
+
+                    {
+                        <div class="text-red mt">
+                            <ul>
+                                @foreach (string error in ViewBag.Errors)
+
+                                {
+                                    <li class="ml">@error</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                </div>
             </div>
         </div>
-
-        <div class="button-panel">
-
-            <button type="submit" formaction="~/Trade/SellOrder" class="button button-red-back trading-button sell-button">
-                <i class="fa-solid fa-arrow-down"></i>
-                <span>Sell</span>
-            </button>
-
-            <button type="submit" formaction="~/Trade/BuyOrder" class="button button-green-back trading-button buy-button">
-                <i class="fa-solid fa-arrow-up"></i>
-                <span>Buy</span>
-            </button>
-
-            @if (ViewBag.Errors != null)
-            {
-                <div class="text-red mt">
-                    <ul>
-                        @foreach (string error in ViewBag.Errors)
-
-                        {
-                            <li class="ml">@error</li>
-                        }
-                    </ul>
-                </div>
-            }
-
-        </div>
     </div>
+
 
     <input type="hidden" asp-for="StockSymbol" />
     <input type="hidden" asp-for="StockName" />
@@ -78,7 +84,16 @@
 </form>
 
 
-@section Scripts {
- <script src="~/Scripts/FinnhubScript.js">
- </script>
+@section Scripts
+
+{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="~/Scripts/ChartScript.js">
+    </script>
+
+    <script src="~/Scripts/FinnhubScript.js">
+    </script>
+
 }
+

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace ServiceContracts.DTO
 {
 
- public class BuyOrderResponse
+ public class BuyOrderResponse:IOrderResponse
  {
 
   public Guid BuyOrderID { get; set; }
@@ -23,7 +23,9 @@ namespace ServiceContracts.DTO
 
   public double TradeAmount { get; set; }
 
-  public override bool Equals(object? obj)
+   public OrderType TypeOfOrder => OrderType.BuyOrder;
+
+        public override bool Equals(object? obj)
   {
    if (obj == null) return false;
    if (obj is not BuyOrderResponse) return false;
