@@ -13,7 +13,7 @@ public class StocksServiceTest
 
     public StocksServiceTest()
     {
-        _stocksService = new StocksService(new StockMarketDbContext(new DbContextOptionsBuilder<StockMarketDbContext>().Options));
+        _stocksService = new StocksService(new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().Options));
     }
 
 

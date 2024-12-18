@@ -2,9 +2,9 @@
 
 namespace Entities;
 
-public class StockMarketDbContext:DbContext
+public class ApplicationDbContext:DbContext
 {
-    public StockMarketDbContext(DbContextOptions<StockMarketDbContext> options):base(options)
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options)
     {
         
     }

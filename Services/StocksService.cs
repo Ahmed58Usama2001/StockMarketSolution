@@ -8,9 +8,9 @@ namespace Services;
 
 public class StocksService : IStocksService
 {
-    private readonly StockMarketDbContext _dbContext;
+    private readonly ApplicationDbContext _dbContext;
 
-    public StocksService(StockMarketDbContext dbContext)
+    public StocksService(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
     }

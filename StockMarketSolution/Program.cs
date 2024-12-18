@@ -13,7 +13,7 @@ builder.Services.AddTransient<IFinnhubService, FinnhubService>();
 builder.Services.AddTransient<IStocksService, StocksService>();
 
 
-builder.Services.AddDbContext<StockMarketDbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
@@ -30,4 +30,5 @@ app.MapControllers();
 
 app.Run();
 
+public partial class Program { }
 
