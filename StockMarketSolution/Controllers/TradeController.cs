@@ -24,7 +24,7 @@ public class TradeController : Controller
         _configuration = configuration;
     }
 
-
+    [Route("[action]")]
     [Route("[action]/{stockSymbol}")]
     [Route("~/[controller]/{stockSymbol}")]
     public async Task<IActionResult> Index(string stockSymbol)
