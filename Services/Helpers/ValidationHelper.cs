@@ -4,7 +4,7 @@ namespace Services.Helpers;
 
 public static class ValidationHelper
 {
-    internal static void ValidateModel(object obj)
+    internal static void ModelValidation(object obj)
     {
         ValidationContext validationContext = new ValidationContext(obj);
         List<ValidationResult> validationResults = new List<ValidationResult>();
