@@ -1,7 +1,5 @@
-﻿using Entities;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Rotativa;
 using Rotativa.AspNetCore;
 using ServiceContracts;
 using ServiceContracts.DTO;
@@ -13,39 +11,38 @@ namespace StockMarketSolution.Controllers;
 public class TradeController : Controller
 {
     private readonly TradingOptions _tradingOptions;
+    private readonly IStocksService _stocksService;
     private readonly IFinnhubService _finnhubService;
     private readonly IConfiguration _configuration;
-    private readonly IStocksService _stocksService;
 
-    public TradeController(IOptions<TradingOptions> tradingOptions, IFinnhubService finnhubService, IConfiguration configuration
-      , IStocksService stocksService)
+
+    public TradeController(IOptions<TradingOptions> tradingOptions, IStocksService stocksService, IFinnhubService finnhubService, IConfiguration configuration)
     {
         _tradingOptions = tradingOptions.Value;
+        _stocksService = stocksService;
         _finnhubService = finnhubService;
         _configuration = configuration;
-        _stocksService = stocksService;
     }
 
 
-    [Route("/")]
-    [Route("[action]")]
-    [Route("~/[controller]")]
-    public async Task<IActionResult> Index()
+    [Route("[action]/{stockSymbol}")]
+    [Route("~/[controller]/{stockSymbol}")]
+    public async Task<IActionResult> Index(string stockSymbol)
     {
-        if (string.IsNullOrEmpty(_tradingOptions.DefaultStockSymbol))
-            _tradingOptions.DefaultStockSymbol = "MSFT";
+        if (string.IsNullOrEmpty(stockSymbol))
+            stockSymbol = "MSFT";
 
 
-        Dictionary<string, object>? companyProfileDictionary = await _finnhubService.GetCompanyProfile(_tradingOptions.DefaultStockSymbol);
+        Dictionary<string, object>? companyProfileDictionary = await _finnhubService.GetCompanyProfile(stockSymbol);
 
-        Dictionary<string, object>? stockQuoteDictionary = await _finnhubService.GetStockPriceQuote(_tradingOptions.DefaultStockSymbol);
+        Dictionary<string, object>? stockQuoteDictionary = await _finnhubService.GetStockPriceQuote(stockSymbol);
 
 
-        StockTrade stockTrade = new StockTrade() { StockSymbol = _tradingOptions.DefaultStockSymbol };
+        StockTrade stockTrade = new StockTrade() { StockSymbol = stockSymbol };
 
         if (companyProfileDictionary != null && stockQuoteDictionary != null)
         {
-            stockTrade = new StockTrade() { StockSymbol = Convert.ToString(companyProfileDictionary["ticker"]), StockName = Convert.ToString(companyProfileDictionary["name"]), Price = Convert.ToDouble(stockQuoteDictionary["c"].ToString()) };
+            stockTrade = new StockTrade() { StockSymbol = companyProfileDictionary["ticker"].ToString(), StockName = companyProfileDictionary["name"].ToString(), Quantity = _tradingOptions.DefaultOrderQuantity ?? 0, Price = Convert.ToDouble(stockQuoteDictionary["c"].ToString()) };
         }
 
         ViewBag.FinnhubToken = _configuration["FinnhubToken"];
@@ -53,28 +50,9 @@ public class TradeController : Controller
         return View(stockTrade);
     }
 
-    [HttpPost("[action]")]
-    public async Task<IActionResult> SellOrder(SellOrderRequest sellOrderRequest)
-    {
-        sellOrderRequest.DateAndTimeOfOrder = DateTime.Now;
 
-        ModelState.Clear();
-        TryValidateModel(sellOrderRequest);
-
-
-        if (!ModelState.IsValid)
-        {
-            ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(v => v.ErrorMessage).ToList();
-            StockTrade stockTrade = new StockTrade() { StockName = sellOrderRequest.StockName, Quantity = sellOrderRequest.Quantity, StockSymbol = sellOrderRequest.StockSymbol };
-            return View("Index", stockTrade);
-        }
-
-        SellOrderResponse sellOrderResponse = await _stocksService.CreateSellOrder(sellOrderRequest);
-
-        return RedirectToAction(nameof(Orders));
-    }
-
-    [HttpPost("[action]")]
+    [Route("[action]")]
+    [HttpPost]
     public async Task<IActionResult> BuyOrder(BuyOrderRequest buyOrderRequest)
     {
         buyOrderRequest.DateAndTimeOfOrder = DateTime.Now;
@@ -85,7 +63,7 @@ public class TradeController : Controller
 
         if (!ModelState.IsValid)
         {
-            ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(v => v.ErrorMessage).ToList();
+            ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
             StockTrade stockTrade = new StockTrade() { StockName = buyOrderRequest.StockName, Quantity = buyOrderRequest.Quantity, StockSymbol = buyOrderRequest.StockSymbol };
             return View("Index", stockTrade);
         }
@@ -95,6 +73,29 @@ public class TradeController : Controller
         return RedirectToAction(nameof(Orders));
     }
 
+
+    [Route("[action]")]
+    [HttpPost]
+    public async Task<IActionResult> SellOrder(SellOrderRequest sellOrderRequest)
+    {
+        sellOrderRequest.DateAndTimeOfOrder = DateTime.Now;
+
+        ModelState.Clear();
+        TryValidateModel(sellOrderRequest);
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            StockTrade stockTrade = new StockTrade() { StockName = sellOrderRequest.StockName, Quantity = sellOrderRequest.Quantity, StockSymbol = sellOrderRequest.StockSymbol };
+            return View("Index", stockTrade);
+        }
+
+        SellOrderResponse sellOrderResponse = await _stocksService.CreateSellOrder(sellOrderRequest);
+
+        return RedirectToAction(nameof(Orders));
+    }
+
+
     [Route("[action]")]
     public async Task<IActionResult> Orders()
     {
@@ -103,8 +104,9 @@ public class TradeController : Controller
 
         Orders orders = new Orders() { BuyOrders = buyOrderResponses, SellOrders = sellOrderResponses };
 
-        return View(orders);
+        ViewBag.TradingOptions = _tradingOptions;
 
+        return View(orders);
     }
 
 
@@ -123,8 +125,5 @@ public class TradeController : Controller
             PageMargins = new Rotativa.AspNetCore.Options.Margins() { Top = 20, Right = 20, Bottom = 20, Left = 20 },
             PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape
         };
-
     }
-
-
 }
