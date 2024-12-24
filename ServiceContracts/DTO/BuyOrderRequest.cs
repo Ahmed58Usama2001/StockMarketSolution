@@ -3,7 +3,7 @@ using Entities;
 namespace ServiceContracts.DTO;
 
 
-public class BuyOrderRequest : IValidatableObject
+public class BuyOrderRequest : IValidatableObject, IOrderRequest
 {
 
 [Required(ErrorMessage = "Stock Symbol can't be null or empty")]

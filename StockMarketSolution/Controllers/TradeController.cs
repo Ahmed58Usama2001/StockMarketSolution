@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Rotativa.AspNetCore;
 using ServiceContracts;
 using ServiceContracts.DTO;
+using StockMarketSolution.Filters.ActionFilters;
 using StockMarketSolution.Models;
 
 namespace StockMarketSolution.Controllers;
@@ -57,21 +58,10 @@ public class TradeController : Controller
 
     [Route("[action]")]
     [HttpPost]
+    [TypeFilter(typeof(CreateOrderActionFilter))]
+
     public async Task<IActionResult> BuyOrder(BuyOrderRequest buyOrderRequest)
     {
-        buyOrderRequest.DateAndTimeOfOrder = DateTime.Now;
-
-        ModelState.Clear();
-        TryValidateModel(buyOrderRequest);
-
-
-        if (!ModelState.IsValid)
-        {
-            ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-            StockTrade stockTrade = new StockTrade() { StockName = buyOrderRequest.StockName, Quantity = buyOrderRequest.Quantity, StockSymbol = buyOrderRequest.StockSymbol };
-            return View("Index", stockTrade);
-        }
-
         BuyOrderResponse buyOrderResponse = await _stocksService.CreateBuyOrder(buyOrderRequest);
 
         return RedirectToAction(nameof(Orders));
@@ -80,19 +70,11 @@ public class TradeController : Controller
 
     [Route("[action]")]
     [HttpPost]
+    [TypeFilter(typeof(CreateOrderActionFilter))]
+
     public async Task<IActionResult> SellOrder(SellOrderRequest sellOrderRequest)
     {
-        sellOrderRequest.DateAndTimeOfOrder = DateTime.Now;
-
-        ModelState.Clear();
-        TryValidateModel(sellOrderRequest);
-
-        if (!ModelState.IsValid)
-        {
-            ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-            StockTrade stockTrade = new StockTrade() { StockName = sellOrderRequest.StockName, Quantity = sellOrderRequest.Quantity, StockSymbol = sellOrderRequest.StockSymbol };
-            return View("Index", stockTrade);
-        }
+        
 
         SellOrderResponse sellOrderResponse = await _stocksService.CreateSellOrder(sellOrderRequest);
 
