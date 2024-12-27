@@ -6,6 +6,7 @@ using Serilog;
 using ServiceContracts;
 using Services;
 using StockMarketSolution;
+using StockMarketSolution.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,10 @@ var app = builder.Build();
 if (builder.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseMiddleware<ExceptionHandlingMiddleware>();
 }
 
 app.UseHttpLogging();
